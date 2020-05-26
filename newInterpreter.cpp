@@ -22,9 +22,10 @@
 #include <llvm/Support/TargetSelect.h>
 #include <llvm/IR/LegacyPassManager.h>
 #include <llvm/Transforms/Scalar.h>
-
+#include <llvm/Transforms/Utils.h>
 #include <llvm/IR/IRBuilder.h>
 #include "newInterpreter.h"
+#include <llvm/IR/Value.h>
 using namespace llvm;
 using namespace std;
 
@@ -139,9 +140,10 @@ using namespace std;
 	    BasicBlock* header = L->getHeader();
 	    
 	    latch = L->getLoopLatch();
-	    TerminatorInst* latch_end = latch->getTerminator();
-	    BranchInst* latch_term = dyn_cast<BranchInst>(latch_end);
-	    
+	    // TerminatorInst* latch_end = latch->getTerminator();
+	    // BranchInst* latch_term = dyn_cast<BranchInst>(latch_end);
+	    BranchInst* latch_term = dyn_cast<BranchInst>(latch->getTerminator());
+
 	    SmallVector<BasicBlock*,8> bb_Exits;
 	    L->getExitBlocks(bb_Exits);
 	    if(bb_Exits.empty())
@@ -221,7 +223,7 @@ using namespace std;
 	    builder.SetInsertPoint(latch);
 	    builder.CreateBr(exit_bb);
 	    
-	    func->dump();
+	    // func->dump();
 
 	}
 	skipSMT_continue_unroll = false;
@@ -306,7 +308,7 @@ using namespace std;
 		    continue;
 		}else
 		{
-		    inst_i->dump();
+		    // inst_i->dump();
 		    outs()<<";this type of varible had not defined ...\n";
 		}
 		decla_formulas = decla_formulas+s;
@@ -775,12 +777,20 @@ using namespace std;
 		    unsigned int n = swInst->getNumCases();
 		    string default_subStr = "(and ";
 		    string s = "(assert (and ";
-		    for(SwitchInst::CaseIt i = swInst->case_begin(),e = swInst->case_end(); i != e; i++)
+		    // for(SwitchInst::CaseIt i = swInst->case_begin(),e = swInst->case_end(); i != e; i++)
+		    // {
+			// string constant = InttoString(i.getCaseValue()->getZExtValue());
+			// string succ_name = i.getCaseSuccessor()->getName().str();
+			// s = s + "(= (and (= "+Cond_str+" "+constant+") $"+bbi_name+") $"+bbi_name+"_"+succ_name+")";
+			// default_subStr = default_subStr +"(not (= "+Cond_str+" "+constant+") ) ";
+		    // }
+			for(unsigned int num=0; num<swInst->getNumCases() ;num++)
 		    {
-			string constant = InttoString(i.getCaseValue()->getZExtValue());
-			string succ_name = i.getCaseSuccessor()->getName().str();
-			s = s + "(= (and (= "+Cond_str+" "+constant+") $"+bbi_name+") $"+bbi_name+"_"+succ_name+")";
-			default_subStr = default_subStr +"(not (= "+Cond_str+" "+constant+") ) ";
+				auto Case = *SwitchInst::ConstCaseIt::fromSuccessorIndex(swInst, num);
+				string constant = InttoString(Case.getCaseValue()->getZExtValue());
+				string succ_name = swInst->getSuccessor(num)->getName().str();
+				s = s + "(= (and (= "+Cond_str+" "+constant+") $"+bbi_name+") $"+bbi_name+"_"+succ_name+")";
+				default_subStr = default_subStr +"(not (= "+Cond_str+" "+constant+") ) ";
 		    }
 		    default_subStr = default_subStr + ")";
 		    s = s + "(= (and $"+bbi_name+" "+default_subStr+" ) $"+bbi_name+"_"+Default_name+") ) )";

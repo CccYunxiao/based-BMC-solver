@@ -22,9 +22,9 @@
 #include <llvm/Support/TargetSelect.h>
 #include <llvm/IR/LegacyPassManager.h>
 #include <llvm/Transforms/Scalar.h>
-
+#include <llvm/Transforms/Utils/Mem2Reg.h>
 #include <llvm/IR/IRBuilder.h>
-
+#include <llvm/IR/Value.h>
 using namespace llvm;
 using namespace std;
 

@@ -9,7 +9,7 @@ int main(int argc, char** argv)
         errs() << "Expected an argument - IR file name\n";  
         exit(1);  
     }  
-    auto& context = getGlobalContext();
+    LLVMContext context;
     newInterpreter *interpreter = new newInterpreter(argv[1],context);
     
 

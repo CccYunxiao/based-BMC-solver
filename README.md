@@ -5,7 +5,7 @@ install:
 
 1.llvm version 3.8.0
 
-2.sudo apt-get install cmake bison flex libboost-all-dev python perl minisat libgmp-dev
+2.sudo apt-get install cmake bison flex libboost-all-dev python perl minisat libgmp-dev libtinfo-dev libz-dev
 
 3.MathSAT 5 smt solver
 
